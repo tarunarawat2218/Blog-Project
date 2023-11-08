@@ -1,15 +1,20 @@
-// server.js
+const app = require('./app'); 
 
-const express = require('express');
-const app = express();
+const dotenv = require("dotenv");
 
-// Set the port to listen on
-app.set('port', 3000);
+dotenv.config();
 
-// Start the server
-app.listen(app.get('port'), () => {
-  console.log(`Server listening on port ${app.get('port')}`);
+
+const PORT = process.env.PORT || 3000;
+const mongoose = require('mongoose');
+
+
+const dbURI = process.env.DB_URI;
+console.log('DB_URI:', dbURI);
+
+// Connect to the MongoDB database
+mongoose.connect(dbURI || "");
+
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
 });
-
-// Export the app
-module.exports = app;

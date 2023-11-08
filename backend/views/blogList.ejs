@@ -1,0 +1,109 @@
+<!-- views/blogList.ejs -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog List</title>
+    <style>
+        /* public/styles/blogList.css */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #dbd7d7;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+.add-blog-button {
+    display: inline-block;
+    background-color: #4CAF50; /* Choose your preferred color */
+    color: #fff;
+    position: absolute; 
+    right: 35rem;    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 5px;
+}
+
+.add-blog-button:hover {
+    background-color: #45a049; /* Darker color on hover */
+}
+
+.blog-list-container {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(99, 213, 5, 0.2);
+    text-align: center;
+    margin: 20px; /* Add margin to the container for spacing from the edge of the page */
+}
+
+h1 {
+    margin: 20px 0;
+    color: #4CAF50; /* Set the text color */
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 10px; /* Equal padding for rows and columns */
+    border: 1px solid #ccc;
+}
+
+th {
+    background-color: #4CAF50;
+    color: #fff;
+    font-weight: bold;
+}
+
+tbody tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+.delete-icon {
+    color: #ff3333;
+    cursor: pointer;
+}
+
+.delete-icon:hover {
+    color: #ff0000;
+}
+
+    </style>
+</head>
+<body>
+    <div class="blog-list-container">
+        <a href="/createBlog" class="add-blog-button">Add Blog</a> <!-- Add this line -->
+
+        <h1>List of Blogs</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Serial No</th>
+                    <th>Blog Name</th>
+                    <th>Category</th>
+                    <th>Author</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% blogs.forEach((blog, index) => { %>
+                    <tr>
+                        <td><%= index + 1 %></td>
+                        <td><%= blog.title %></td>
+                        <td><%= blog.category %></td>
+                        <td><%= blog.author %></td>
+                        <td>
+                            <i class="fas fa-trash delete-icon" data-blog-id="<%= blog.id %>"></i>
+                        </td>
+                    </tr>
+                <% }); %>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

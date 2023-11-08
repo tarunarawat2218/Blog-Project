@@ -1,49 +1,53 @@
-const userModel = require('../models/userModel'); // Import your user model
-const bcrypt = require('bcrypt');
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const User = require("../models/userModel");
+const UserService = require("../services/authService");
+const ApiResponse = require('../responses/apiResponses')
+const ApiResponseMessages = require('../responses/apiResponseMessage')
 
 const registerUser = async (req, res) => {
   try {
-    const { email, password } = req.body;
-    // Hash the password before saving it to the database
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const user = await userModel.createUser({ email, password: hashedPassword });
-    res.status(201).json({ message: 'User registered successfully', user });
+    const { username, email, password } = req.body;
+    const existingUser = await UserService.findExistingUser(username, email);
+    if (existingUser) {
+      ApiResponse.conflict(res, ApiResponseMessages.USER_ALREADY_EXISTS) 
+    }
+    const savedUser = await UserService.createAUser(username, email, password);
+
+   ApiResponse.success(res, ApiResponseMessages.USER_CREATED_SUCCESSFULLY) 
   } catch (error) {
-    console.error('Error registering user:', error);
-    res.status(500).json({ error: 'User registration failed' });
+    console.error("Error:", error);
+   ApiResponse.internalServerError(res, ApiResponseMessages.USER_NOT_FOUND) 
   }
 };
 
 const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const user = await userModel.getUserByEmail(email);
+
+    const user = await UserService.findExistingUserByEmail(email);
+
     if (!user) {
-      return res.status(404).json({ error: 'User not found' });
+     ApiResponse.internalServerError(res, ApiResponseMessages.INTERNAL_SERVER_ERROR)
     }
-    const passwordMatch = await bcrypt.compare(password, user.password);
-    if (passwordMatch) {
-      // Set up user session or issue a token for authentication
-      // Replace this with your preferred authentication method
-      // For example, you can use Passport.js for authentication.
-      res.json({ message: 'Login successful', user });
-    } else {
-      res.status(401).json({ error: 'Invalid credentials' });
+
+    const passwordMatch = await UserService.checkUserPassword(
+      password,
+      user.password
+    );
+
+    if (!passwordMatch) {
+     ApiResponse.internalServerError(res, ApiResponseMessages.INTERNAL_SERVER_ERROR)
     }
+
+    // Generate a JWT token for authentication
+    const token = await UserService.createToken(user._id);
+
+    ApiResponse.success(res, {token}, ApiResponseMessages.LOGIN_SUCCESSFULLY)
   } catch (error) {
-    console.error('Error logging in:', error);
-    res.status(500).json({ error: 'Login failed' });
+    console.error("Error:", error);
+    ApiResponse.internalServerError(res, ApiResponseMessages.INTERNAL_SERVER_ERROR, e)
   }
 };
 
-const logoutUser = (req, res) => {
-  // Implement your logout logic here (e.g., destroying the session or revoking the token)
-  // Depending on your authentication method
-  res.json({ message: 'Logout successful' });
-};
-
-module.exports = {
-  registerUser,
-  loginUser,
-  logoutUser,
-};
+module.exports = { registerUser, loginUser };
