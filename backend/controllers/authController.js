@@ -40,7 +40,6 @@ const loginUser = async (req, res) => {
      ApiResponse.internalServerError(res, ApiResponseMessages.INTERNAL_SERVER_ERROR)
     }
 
-    // Generate a JWT token for authentication
     const token = await UserService.createToken(user._id);
 
     ApiResponse.success(res, {token}, ApiResponseMessages.LOGIN_SUCCESSFULLY)

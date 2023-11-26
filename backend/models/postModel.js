@@ -25,7 +25,7 @@ const postSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
-  // You can add more fields as needed for your blog posts
+  
 });
 
 const Post = mongoose.model('Post', postSchema);
